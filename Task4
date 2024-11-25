@@ -1,0 +1,20 @@
+CREATE OR REPLACE FUNCTION GET_YEARS_SERVICE(
+    employee_id_input INT
+)
+    RETURNS NUMERIC AS $$
+DECLARE
+    years_service NUMERIC;
+    hire_date DATE;
+BEGIN
+    SELECT hire_date INTO hire_date
+    FROM employees
+    WHERE employee_id = employee_id_input;
+
+    years_service := DATE_PART('year', AGE(CURRENT_DATE, hire_date));
+
+    RETURN years_service;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RAISE EXCEPTION 'not found', employee_id_input;
+END;
+$$ LANGUAGE plpgsql;
