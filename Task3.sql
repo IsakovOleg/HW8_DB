@@ -7,8 +7,7 @@ CREATE OR REPLACE PROCEDURE UPD_JOBSAL(
 AS $$
 BEGIN
     IF new_max_salary < new_min_salary THEN
-        RAISE EXCEPTION 'exception',
-            new_max_salary, new_min_salary;
+        RAISE EXCEPTION 'EXCEPTION', new_max_salary, new_min_salary;
     END IF;
 
     UPDATE jobs
@@ -16,13 +15,18 @@ BEGIN
     WHERE job_id = job_id_input;
 
     IF NOT FOUND THEN
-        RAISE EXCEPTION 'not found', job_id_input;
+        RAISE EXCEPTION 'not exist', job_id_input;
     END IF;
 
-    RAISE NOTICE 'updated',
-        job_id_input, new_min_salary, new_max_salary;
+    RAISE NOTICE 'updated', job_id_input, new_min_salary, new_max_salary;
+
 EXCEPTION
     WHEN SQLSTATE '55P03' THEN
-        RAISE EXCEPTION 'exception';
+        RAISE EXCEPTION 'locked', job_id_input;
 END;
 $$;
+
+CALL UPD_JOBSAL('SY_ANAL', 7000, 14000);
+CALL UPD_JOBSAL('SY_ANAL', 14000, 7000);
+CALL UPD_JOBSAL('INVALID_JOB', 7000, 14000);
+SELECT * FROM jobs WHERE job_id = 'SY_ANAL';
