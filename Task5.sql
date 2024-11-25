@@ -5,6 +5,10 @@ CREATE OR REPLACE FUNCTION GET_JOB_COUNT(
 DECLARE
     job_count INT;
 BEGIN
+    IF employee_id_input IS NULL THEN
+        RAISE EXCEPTION 'cannot be NULL';
+    END IF;
+
     SELECT COUNT(DISTINCT job_id)
     INTO job_count
     FROM (
@@ -26,3 +30,9 @@ BEGIN
     RETURN job_count;
 END;
 $$ LANGUAGE plpgsql;
+
+
+SELECT GET_JOB_COUNT(176) AS job_count;
+SELECT GET_JOB_COUNT(106) AS job_count;
+SELECT GET_JOB_COUNT(999) AS job_count;
+SELECT * FROM job_history WHERE employee_id = 176;
